@@ -1,6 +1,6 @@
 class Token {
 
-	protected int kind, tokenSpeed, tokenSize;
+	protected int kind, tokenSpeed, tokenSize, tokenX, tokenY;
 
 
 	/*------------------------------------------------------------------
@@ -9,20 +9,31 @@ class Token {
 	|| 	Set tokenSpeed(int)
 	||  Set tokenSize(int)
 	-------------------------------------------------------------------*/
+	TokenBullet tokenbullet;
 
-	Token () {
+	Token() {
 		kind = 0;
 		tokenSpeed = 3;
 		tokenSize = 10;
+		tokenX = 0;
+		tokenY = 0;
+	}
+	float startYmin = fieldTop;
+	float startYmax = fieldBot;
+
+
+	void makeToken() {
+		//float tokenX = -tokenSize;
+		float tokenY = random(fieldTop, fieldBot);
+
+		//tokenBullet.makeBullet(tokenX, tokenY);
+		for (float tokenX = -tokenSize; tokenX < width; tokenX = tokenX + tokenSpeed) {
+			tokenbullet.makeBullet(tokenX, tokenY);
+		}
+
+
 	}
 
-	float startY;
-	int startX;
 
-	protected void makeBuddy(int fieldTop, int fieldBot) {
-		startY = random(fieldTop+tokenSize/2, fieldBot-tokenSize/2);
-		startX = -tokenSize;
-
-		ellipse(startX, startY, tokenSize, tokenSize);
-	}
+	
 }
