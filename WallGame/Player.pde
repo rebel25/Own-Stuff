@@ -1,7 +1,7 @@
 class Player {
 
-  protected int playerWidth, playerPosY, playerPosX, gapHeight;
-
+  protected int playerWidth, playerPosY, playerPosX, gapHeight, playerSpeed, barLeft, barRight, gapTop, gapBottom;
+          
   /*------------------------------------------------------------------
   ||  Initializer for Class/Object
   ||  Set playerWidth(int)
@@ -9,29 +9,38 @@ class Player {
   ||  Set playerPosX(int)
   ||  Set gapHeight(int)
   -------------------------------------------------------------------*/
+
+
   Player() {
-    playerWidth = 25;
+    playerWidth = fieldTop;
     playerPosY = 0;
     playerPosX = 0;
-    gapHeight = 30;
+    gapHeight = 60;
+    playerSpeed = 5;
+    barLeft = 0;
+
   }
 
   /*------------------------------------------------------------------
   ||  Create Playerbody
   -------------------------------------------------------------------*/
   protected void playerBody(){
-    int barLeft = (playerPosX-playerWidth/2);
-    int barRight = (playerPosX+playerWidth/2);
-    int gapTop = (playerPosY-gapHeight/2);
-    int gapBottom = (playerPosY+gapHeight/2);
+
+    barLeft = (playerPosX-playerWidth/2);
+    barRight = (playerPosX+playerWidth/2);
+    gapTop = (playerPosY-gapHeight/2);
+    gapBottom = (playerPosY+gapHeight/2);
 
     noStroke();
     rectMode(CORNERS);
-    rect(barLeft, 0, barRight, gapTop);
+    rect(barLeft, fieldTop, barRight, gapTop);
     rectMode(CORNERS);
-    rect(barLeft, gapBottom, barRight, height);
-  }
+    rect(barLeft, gapBottom, barRight, fieldBot);
 
+    //println("barLeft__: "+barLeft);
+
+    collider.fillPlayerArray(gapTop, gapBottom, barLeft, barRight, fieldTop, fieldBot);
+  }
 
   /*------------------------------------------------------------------
   ||  Set/Get Y Position of Player
@@ -69,5 +78,29 @@ class Player {
 
   protected int getXPosition() {
     return playerPosX;
+  }
+
+  /*------------------------------------------------------------------
+  ||  Get Body values
+  -------------------------------------------------------------------*/
+
+ /* protected void setBarLeft() {
+    
+  }*/
+
+  protected int getBarLeft() {
+    return barLeft;
+  }
+
+  protected int getBarRight() {
+    return barRight;
+  }
+
+  protected int getGapTop() {
+    return gapTop;
+  }
+
+  protected int getGapBottom() {
+    return gapBottom;
   }
 }

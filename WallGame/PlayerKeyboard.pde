@@ -20,7 +20,7 @@ class PlayerKeyboard extends Player {
         } else if (playerPosY - gapHeight/2 == fieldTop) {
           setYPositionUp(0);
         } else {
-          setYPositionUp(3); 
+          setYPositionUp(playerSpeed);
         }
       break;
       case 's': case 'S':
@@ -29,7 +29,7 @@ class PlayerKeyboard extends Player {
         } else if (playerPosY + gapHeight/2 == fieldBot) {
           setYPositionUp(0);
         } else {
-          setYPositionDown(3);          
+          setYPositionDown(playerSpeed);          
         }
       break;
       default:
