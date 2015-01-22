@@ -12,6 +12,8 @@ Collider collider;
 float color1 = random(255);
 float color2 = random(255);
 float color3 = random(255);
+//color field = (color1, color2, color3);
+//color player = ((255-color1), (255-color2), (255-color3));
 int fieldTop;
 int fieldBot;
 
@@ -30,27 +32,19 @@ void setup() {
 	tokenBullet = new TokenBullet();
 	tokenBullet.setTokenX(-10);
   collider = new Collider();
-
-	
-
-
-
 }
 
 void draw() {
-	background(255-color1, 255-color2, 255-color3);
+	background(color1, color2, color3);
 	noStroke();
 
-	fill(color1, color2, color3);
+	fill((255-color1), (255-color2), (255-color3));
 	rect(0, 0, width, fieldTop);
 	rect(0, fieldBot, width, height);
 	
 	playerKeyboard.playerBody();
 	tokenBullet.makeToken();
-
-	
 }
-
 
 void keyPressed() {
   playerKeyboard.moveWithKeyboard(fieldTop, fieldBot);

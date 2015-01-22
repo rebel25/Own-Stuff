@@ -1,4 +1,5 @@
 class Player {
+  PShape playerBodySvg;
 
   protected int playerWidth, playerPosY, playerPosX, gapHeight, playerSpeed, barLeft, barRight, gapTop, gapBottom;
           
@@ -31,15 +32,17 @@ class Player {
     gapTop = (playerPosY-gapHeight/2);
     gapBottom = (playerPosY+gapHeight/2);
 
+    playerBodySvg = loadShape("svgs/rectangle.svg");
+    playerBodySvg.disableStyle();
+
     noStroke();
-    rectMode(CORNERS);
-    rect(barLeft, fieldTop, barRight, gapTop);
-    rectMode(CORNERS);
-    rect(barLeft, gapBottom, barRight, fieldBot);
+    shapeMode(CORNERS);
+    shape(playerBodySvg, barLeft, fieldTop, barRight, gapTop);
+    shapeMode(CORNERS);
+    shape(playerBodySvg, barLeft, gapBottom, barRight, fieldBot);
 
-    //println("barLeft__: "+barLeft);
-
-    collider.fillPlayerArray(gapTop, gapBottom, barLeft, barRight, fieldTop, fieldBot);
+    collider.fillPlayerArray(barLeft, fieldTop, barRight, gapTop, gapBottom, fieldBot);
+    
   }
 
   /*------------------------------------------------------------------

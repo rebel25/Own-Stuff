@@ -1,6 +1,6 @@
 class Token {
 
-	protected int kind, tokenSpeed, tokenSize, tokenX, tokenY, maxKind, collision;
+	protected int kind, tokenSpeed, tokenWidth, tokenHeight, tokenX, tokenY, maxKind, collision;
 
 	/*------------------------------------------------------------------
 	||  Initializer for Class/Object
@@ -14,16 +14,17 @@ class Token {
 		maxKind = 1;
 		kind = 0;
 		tokenSpeed = 8;
-		tokenSize = 10;
+		tokenWidth = 10;
+		tokenHeight = 10;
 		tokenX = 0;
 		tokenY = 0;
 		collision = 0;
 	}
-	float startYmin = fieldTop + tokenSize/2;
-	float startYmax = fieldBot - tokenSize/2;
+	float startYmin = fieldTop;
+	float startYmax = fieldBot - tokenWidth;
 	
 	void makeToken() {
-		if (tokenX == -tokenSize) {
+		if (tokenX == -tokenWidth) {
 			kind = int(random(0, maxKind+1));
 			setTokenY(random(startYmin, startYmax));
 			println("kind: "+kind);
@@ -35,22 +36,22 @@ class Token {
 
 		switch (kind) {
 			case 0 :
-				if (tokenX <= width + tokenSize) {
+				if (tokenX <= width + tokenWidth) {
 					setTokenXRight(tokenSpeed);
 					println("tokenX: "+tokenX);
 					tokenBullet.makeBullet(tokenX, tokenY);
 				} else {
-					setTokenX(-tokenSize);
+					setTokenX(-tokenWidth);
 					setTokenY(random(startYmin, startYmax));
 				}
 			break;	
 			case 1 :
-				if (tokenX <= width + tokenSize) {
+				if (tokenX <= width + tokenWidth) {
 					setTokenXRight(tokenSpeed);
 					//println("tokenX: "+tokenX);
 					tokenBullet.makeSpeed(tokenX, tokenY);
 				} else {
-					setTokenX(-tokenSize);
+					setTokenX(-tokenWidth);
 					setTokenY(random(startYmin, startYmax));
 				}
 			break;	
