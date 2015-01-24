@@ -16,8 +16,8 @@ class Player {
     playerWidth = fieldTop;
     playerPosY = 0;
     playerPosX = 0;
-    gapHeight = 60;
-    playerSpeed = 5;
+    gapHeight = 120;
+    playerSpeed = 8;
     barLeft = 0;
 
   }
@@ -42,7 +42,6 @@ class Player {
     shape(playerBodySvg, barLeft, gapBottom, barRight, fieldBot);
 
     collider.fillPlayerArray(barLeft, fieldTop, barRight, gapTop, gapBottom, fieldBot);
-    
   }
 
   /*------------------------------------------------------------------

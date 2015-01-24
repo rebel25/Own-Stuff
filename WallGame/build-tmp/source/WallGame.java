@@ -25,11 +25,11 @@ TokenBullet tokenBullet;
 Token token;
 Collider collider;
 
-float color1 = random(255);
-float color2 = random(255);
-float color3 = random(255);
-//color field = (color1, color2, color3);
-//color player = ((255-color1), (255-color2), (255-color3));
+int color1 = PApplet.parseInt(random(255));
+int color2 = PApplet.parseInt(random(255));
+int color3 = PApplet.parseInt(random(255));
+int field = color(color1, color2, color3);
+int player = color((255-color1), (255-color2), (255-color3));
 int fieldTop;
 int fieldBot;
 
@@ -51,10 +51,10 @@ public void setup() {
 }
 
 public void draw() {
-	background(color1, color2, color3);
+	background(field);
 	noStroke();
 
-	fill((255-color1), (255-color2), (255-color3));
+	fill(player);
 	rect(0, 0, width, fieldTop);
 	rect(0, fieldBot, width, height);
 	
@@ -65,19 +65,11 @@ public void draw() {
 public void keyPressed() {
   playerKeyboard.moveWithKeyboard(fieldTop, fieldBot);
 }
-
-/*void createToken() {
-	tokenBullet.tokenMovement();
-}*/
 class Collider {
 
 	protected int playerY, playerX, gapTop, gapBottom, barLeft, barRight, kind;
 	protected float[] playerArray = {0, 0, 0, 0, 0, 0};
 	protected float[] tokenArray = {0, 0, 0, 0};
-	float[] overlap;
-	//Player player;
-
-
 
 	Collider() {
 	playerY = 0;
@@ -91,12 +83,8 @@ class Collider {
 
 	Player player;
 
-	public void collision(int _kind){
-		kind = _kind;
-		box_box_p(tokenArray[0], tokenArray[1], tokenArray[2], tokenArray[3], playerArray[0], playerArray[1], playerArray[2], playerArray[3], playerArray[4], playerArray[5]);
-		//overlap(float[] box_box_p,)
-
-
+	public boolean collision(){
+	return box_box_p(tokenArray[0], tokenArray[1], tokenArray[2], tokenArray[3], playerArray[0], playerArray[1], playerArray[2], playerArray[3], playerArray[4], playerArray[5]);
 	}
 
 	public void fillPlayerArray(float _barLeft, float _fieldTop, float _barRight, float _gapTop, float _gapBottom, float _fieldBot){
@@ -122,9 +110,8 @@ class Collider {
 		float leftOverlap = 0;
 		float rightOverlap = 0;
 
-		float[] result = null;
-		float topToken = min(ty0, ty1);
-		float botToken = max(ty0, ty1);
+		float topToken = min(ty0, ty0+ty1);
+		float botToken = max(ty0, ty0+ty1);
 		float leftToken = min(tx0, tx1);
 		float rightToken = max(tx0, tx1);
 
@@ -136,93 +123,15 @@ class Collider {
 		float leftPlayer = min(px0, px1);
 		float rightPlayer = max(px0, px1);
 
-		if(botToken <= topPlayer1 || botToken <= topPlayer2 || botPlayer1 <= topToken || botPlayer2 <= topToken || rightToken <= leftPlayer || rightPlayer <= leftToken){
-			return false;
+		if(((botToken >= topPlayer2) || (topToken <= botPlayer1)) && ((leftToken <= rightPlayer) && (leftToken >= leftPlayer) || (rightToken >= leftPlayer) && (rightToken <= rightPlayer))){
+			//println("new: yes");
+			//println("topToken: "+topToken + " botPlayer1: " + botPlayer1);
+			return true;
 		} else {
-			leftOverlap = (leftToken < leftPlayer) ? leftPlayer : leftToken;
-			rightOverlap = (rightToken > rightPlayer) ? rightPlayer : rightToken;
-			if (topToken < botPlayer1) {
-				topOverlap = (topToken < topPlayer1) ? topPlayer1 : topToken;
-				botOverlap = (botToken < botPlayer1) ? botPlayer1 : botToken;
-			} else {
-				topOverlap = (topToken < topPlayer2) ? topPlayer2 : topToken;
-				botOverlap = (botToken < botPlayer2) ? botPlayer2 : botToken;
-			}
-			return true;//{leftOverlap, topOverlap, rightOverlap, botOverlap};
+			//println("new: no");
+			return false;
 		}
-
-		float aPx = leftOverlap - leftToken;
-		float aPy = topOverlap - topToken;
-		float aSx = rightOverlap - leftToken;
-		float aSy = botOverlap - topToken - 1;
-		float bPx = leftOverlap - leftPlayer;
-		float bPy1 = topOverlap - topPlayer1;
-		float bPy2 = topOverlap - topPlayer2;
-
-		float widthOverlap = rightOverlap - leftOverlap;
-		boolean foundCollision = false;
-
-		player.playerBody();
-		tokenBullet.makeToken();
-
-		boolean pixelAtrans = true;
-		boolean pixelBtrans = true;
-
-		float pA = (aPy * (barRight - barLeft)) + aPx;
-		float pB = (bPy1 * tokenArray[2]) + bPx;
-
-		//float ax = aPx;
-		//float ay = aPy;
-		float bx = bPx;
-		float by1 = bPy1;
-		float by2 = bPy2;
-
-		for (float ay = aPy; ay < aSy; ay++) {
-			bx = bPx;
-			for (float ax = aPx; ax < aSx; ax++) {
-				pixelAtrans = alpha(playerBody.pixels[pA]) < ALPHALEVEL;
-				pixelBtrans = alpha(makeToken.pixels[pB]) < ALPHALEVEL;
-
-				if (!pixelAtrans && !pixelBtrans) {
-					foundCollision = true;
-					break;
-				}
-				pA ++;
-				pB ++;
-				bx ++;
-			}
-			if (foundCollision) break;
-			pA = pA + (barRight - barLeft) - widthOverlap;
-			pB = pB + tokenArray[2] - widthOverlap;
-			by1++;
-		}
-		return foundCollision;
 	}
-
-
-
-
-
-
-
-
-
-/*
-
-	boolean overLap(float[] box_box_p, color[] data1, color[] data2){
-		float left = float[0];
-		float top = float[1];
-		float right = float[2];
-		float bot = float[3];
-		for(int y = top; y < bot; y++){
-			for(int x = left; y < right; x++){
-
-				color color1 = data1[(x - left) + (y - top) * (right - left)];
-				color color2 = data2[(x - right) + (y - bot) * (right - left)];
-
-			}
-		}
-	}*/
 }	
 class Player {
   PShape playerBodySvg;
@@ -242,8 +151,8 @@ class Player {
     playerWidth = fieldTop;
     playerPosY = 0;
     playerPosX = 0;
-    gapHeight = 60;
-    playerSpeed = 5;
+    gapHeight = 120;
+    playerSpeed = 8;
     barLeft = 0;
 
   }
@@ -268,7 +177,6 @@ class Player {
     shape(playerBodySvg, barLeft, gapBottom, barRight, fieldBot);
 
     collider.fillPlayerArray(barLeft, fieldTop, barRight, gapTop, gapBottom, fieldBot);
-    
   }
 
   /*------------------------------------------------------------------
@@ -375,7 +283,7 @@ class PlayerKeyboard extends Player {
 }
 class Token {
 
-	protected int kind, tokenSpeed, tokenWidth, tokenHeight, tokenX, tokenY, maxKind, collision;
+	protected int kind, tokenSpeed, tokenWidth, tokenHeight, tokenX, tokenY, maxKind, collision, collisionStep, reset;
 
 	/*------------------------------------------------------------------
 	||  Initializer for Class/Object
@@ -388,21 +296,26 @@ class Token {
 	Token() {
 		maxKind = 1;
 		kind = 0;
-		tokenSpeed = 8;
+		tokenSpeed = 6;
 		tokenWidth = 10;
 		tokenHeight = 10;
 		tokenX = 0;
 		tokenY = 0;
 		collision = 0;
+		collisionStep = 0;
+		reset = 0;
 	}
+	
 	float startYmin = fieldTop;
 	float startYmax = fieldBot - tokenWidth;
 	
 	public void makeToken() {
+		//setTokenXRight(-tokenWidth);
 		if (tokenX == -tokenWidth) {
-			kind = PApplet.parseInt(random(0, maxKind+1));
+			kind = PApplet.parseInt(random(0, maxKind));
 			setTokenY(random(startYmin, startYmax));
-			println("kind: "+kind);
+			//println("tokenX: "+tokenX);
+			resetToken(0);
 		}
 
   /*------------------------------------------------------------------
@@ -412,9 +325,15 @@ class Token {
 		switch (kind) {
 			case 0 :
 				if (tokenX <= width + tokenWidth) {
-					setTokenXRight(tokenSpeed);
-					println("tokenX: "+tokenX);
-					tokenBullet.makeBullet(tokenX, tokenY);
+					if (reset == 0) {
+						setTokenXRight(getTokenSpeed());
+						tokenBullet.makeBullet(tokenX, tokenY);
+					} else {
+						setTokenSpeed(6);
+						setTokenX(-tokenWidth);
+
+					  resetToken(0);
+					}
 				} else {
 					setTokenX(-tokenWidth);
 					setTokenY(random(startYmin, startYmax));
@@ -422,9 +341,13 @@ class Token {
 			break;	
 			case 1 :
 				if (tokenX <= width + tokenWidth) {
-					setTokenXRight(tokenSpeed);
-					//println("tokenX: "+tokenX);
-					tokenBullet.makeSpeed(tokenX, tokenY);
+					if (reset == 0) {
+					 	setTokenXRight(getTokenSpeed());
+						tokenBullet.makeSpeed(tokenX, tokenY);
+					} else {
+						setTokenX(-tokenWidth);
+						resetToken(0);
+					}
 				} else {
 					setTokenX(-tokenWidth);
 					setTokenY(random(startYmin, startYmax));
@@ -442,15 +365,15 @@ class Token {
 	}
 
   public void setTokenXRight(int _step) {
-	tokenX = getTokenX() + _step;
+		tokenX = getTokenX() + _step;
   }
 
   public void setTokenXLeft(int _step) {
-	tokenX = getTokenX() - _step;
+		tokenX = getTokenX() - _step;
   }
 
   public int getTokenX() {
-	return tokenX;
+		return tokenX;
   }
 
   /*------------------------------------------------------------------
@@ -462,15 +385,63 @@ class Token {
 	}
 
   public void setTokenYDown(int _step) {
-	tokenY = getTokenY() + _step;
+		tokenY = getTokenY() + _step;
   }
 
   public void setTokenYUp(int _step) {
-	tokenY = getTokenY() - _step;
+		tokenY = getTokenY() - _step;
   }
 
   public int getTokenY() {
-	return tokenY;
+		return tokenY;
+  }
+
+  /*------------------------------------------------------------------
+  ||  Set/Get Token speed
+  -------------------------------------------------------------------*/
+
+
+  public void setTokenSpeed(int _tokenSpeed) {
+  	tokenSpeed = PApplet.parseInt(_tokenSpeed);
+  }
+
+  public void setTokenSpeedUp(int _step) {
+  	tokenSpeed = getTokenSpeed() + _step;
+  }
+
+  public void setTokenSpeedDown(int _step) {
+  	tokenSpeed = getTokenSpeed() - _step;
+  }
+
+  public int getTokenSpeed() {
+  	return tokenSpeed;
+  }
+
+
+
+
+  public void setCollisionStep(int _collisionStep) {
+  	collisionStep = PApplet.parseInt(_collisionStep);
+  }
+
+  public void setCollisionStepUp(int _step) {
+  	collisionStep = getCollisionStep() + _step;
+  }
+
+  public int getCollisionStep() {
+  	return collisionStep;
+  }
+
+
+
+ 	public boolean resetToken(int _reset) {
+  	if (_reset > 0) {
+  		reset = 1;
+  		return true;
+  	} else {
+  		reset = 0;
+  	return false;
+  	}
   }
 }
 class TokenBullet extends Token {
@@ -481,31 +452,55 @@ class TokenBullet extends Token {
 		super();
 	}
 
+
 	protected void makeTokenSvg(String _tokenPath) {
 		tokenSvg = loadShape(_tokenPath);
-
 		tokenSvg.disableStyle();
 		noStroke();
-
 		shapeMode(CORNER);
 		shape(tokenSvg, tokenX, tokenY, tokenWidth, tokenHeight);
-		
 	}
 
-	public void makeBullet(float tokenX, float tokenY) {
-		//color[] tokenColor {255, 255, 255};
-		fill(255, 255, 255);
-		makeTokenSvg("svgs/rectangle.svg");
-		//ellipse(tokenX, tokenY, tokenSize, tokenSize);
-		//collider.collision(kind);
-		collider.fillTokenArray(tokenX, tokenY, tokenWidth, tokenHeight);
+
+	protected void makeTokenExplode(String _tokenPath){
+		tokenSvg = loadShape(_tokenPath);
+		tokenSvg.disableStyle();
+		noStroke();
+		int _step = getCollisionStep();
+		println("_step: "+_step);
+		fill(255, 255, 255, 255-(_step*7));
+		shapeMode(CORNER);
+		shape(tokenSvg, tokenX, tokenY, tokenWidth, tokenHeight);
 	}
+
+
+
+	public void makeBullet(float tokenX, float tokenY) {
+		collider.fillTokenArray(tokenX, tokenY, tokenWidth, tokenHeight);
+		collider.collision();
+		println("collider.collision(): "+collider.collision());
+
+		if (collider.collision()) {
+			if (getCollisionStep() < 36) {
+				setTokenSpeed(0);
+				makeTokenExplode("svgs/rectangle.svg");
+				setCollisionStepUp(1);
+			} else {
+				setCollisionStep(0);
+				resetToken(1);
+			}
+		} else {
+			fill(255, 255, 255);
+			makeTokenSvg("svgs/rectangle.svg");
+		}
+	}
+
+
 
 	public void makeSpeed(float tokenX, float tokenY) {
 		fill(0, 0, 0);
 		makeTokenSvg("svgs/triangle.svg");
-		//triangle(tokenX - tokenSize/2, tokenY - tokenSize/2, tokenX + tokenSize/2, tokenY - tokenSize/2, tokenX, tokenY + tokenSize/2);
-		//collider.collision(kind);
+		collider.collision();
 		collider.fillTokenArray(tokenX, tokenY, tokenWidth, tokenHeight);
 	}
 }

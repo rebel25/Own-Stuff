@@ -9,11 +9,11 @@ TokenBullet tokenBullet;
 Token token;
 Collider collider;
 
-float color1 = random(255);
-float color2 = random(255);
-float color3 = random(255);
-//color field = (color1, color2, color3);
-//color player = ((255-color1), (255-color2), (255-color3));
+int color1 = int(random(255));
+int color2 = int(random(255));
+int color3 = int(random(255));
+color field = color(color1, color2, color3);
+color player = color((255-color1), (255-color2), (255-color3));
 int fieldTop;
 int fieldBot;
 
@@ -35,10 +35,10 @@ void setup() {
 }
 
 void draw() {
-	background(color1, color2, color3);
+	background(field);
 	noStroke();
 
-	fill((255-color1), (255-color2), (255-color3));
+	fill(player);
 	rect(0, 0, width, fieldTop);
 	rect(0, fieldBot, width, height);
 	
@@ -49,7 +49,3 @@ void draw() {
 void keyPressed() {
   playerKeyboard.moveWithKeyboard(fieldTop, fieldBot);
 }
-
-/*void createToken() {
-	tokenBullet.tokenMovement();
-}*/

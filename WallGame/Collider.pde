@@ -3,10 +3,6 @@ class Collider {
 	protected int playerY, playerX, gapTop, gapBottom, barLeft, barRight, kind;
 	protected float[] playerArray = {0, 0, 0, 0, 0, 0};
 	protected float[] tokenArray = {0, 0, 0, 0};
-	float[] overlap;
-	//Player player;
-
-
 
 	Collider() {
 	playerY = 0;
@@ -20,12 +16,8 @@ class Collider {
 
 	Player player;
 
-	void collision(int _kind){
-		kind = _kind;
-		box_box_p(tokenArray[0], tokenArray[1], tokenArray[2], tokenArray[3], playerArray[0], playerArray[1], playerArray[2], playerArray[3], playerArray[4], playerArray[5]);
-		//overlap(float[] box_box_p,)
-
-
+	boolean collision(){
+	return box_box_p(tokenArray[0], tokenArray[1], tokenArray[2], tokenArray[3], playerArray[0], playerArray[1], playerArray[2], playerArray[3], playerArray[4], playerArray[5]);
 	}
 
 	void fillPlayerArray(float _barLeft, float _fieldTop, float _barRight, float _gapTop, float _gapBottom, float _fieldBot){
@@ -51,9 +43,8 @@ class Collider {
 		float leftOverlap = 0;
 		float rightOverlap = 0;
 
-		float[] result = null;
-		float topToken = min(ty0, ty1);
-		float botToken = max(ty0, ty1);
+		float topToken = min(ty0, ty0+ty1);
+		float botToken = max(ty0, ty0+ty1);
 		float leftToken = min(tx0, tx1);
 		float rightToken = max(tx0, tx1);
 
@@ -65,91 +56,13 @@ class Collider {
 		float leftPlayer = min(px0, px1);
 		float rightPlayer = max(px0, px1);
 
-		if(botToken <= topPlayer1 || botToken <= topPlayer2 || botPlayer1 <= topToken || botPlayer2 <= topToken || rightToken <= leftPlayer || rightPlayer <= leftToken){
-			return false;
+		if(((botToken >= topPlayer2) || (topToken <= botPlayer1)) && ((leftToken <= rightPlayer) && (leftToken >= leftPlayer) || (rightToken >= leftPlayer) && (rightToken <= rightPlayer))){
+			//println("new: yes");
+			//println("topToken: "+topToken + " botPlayer1: " + botPlayer1);
+			return true;
 		} else {
-			leftOverlap = (leftToken < leftPlayer) ? leftPlayer : leftToken;
-			rightOverlap = (rightToken > rightPlayer) ? rightPlayer : rightToken;
-			if (topToken < botPlayer1) {
-				topOverlap = (topToken < topPlayer1) ? topPlayer1 : topToken;
-				botOverlap = (botToken < botPlayer1) ? botPlayer1 : botToken;
-			} else {
-				topOverlap = (topToken < topPlayer2) ? topPlayer2 : topToken;
-				botOverlap = (botToken < botPlayer2) ? botPlayer2 : botToken;
-			}
-			return true;//{leftOverlap, topOverlap, rightOverlap, botOverlap};
+			//println("new: no");
+			return false;
 		}
-
-		float aPx = leftOverlap - leftToken;
-		float aPy = topOverlap - topToken;
-		float aSx = rightOverlap - leftToken;
-		float aSy = botOverlap - topToken - 1;
-		float bPx = leftOverlap - leftPlayer;
-		float bPy1 = topOverlap - topPlayer1;
-		float bPy2 = topOverlap - topPlayer2;
-
-		float widthOverlap = rightOverlap - leftOverlap;
-		boolean foundCollision = false;
-
-		player.playerBody();
-		tokenBullet.makeToken();
-
-		boolean pixelAtrans = true;
-		boolean pixelBtrans = true;
-
-		float pA = (aPy * (barRight - barLeft)) + aPx;
-		float pB = (bPy1 * tokenArray[2]) + bPx;
-
-		//float ax = aPx;
-		//float ay = aPy;
-		float bx = bPx;
-		float by1 = bPy1;
-		float by2 = bPy2;
-
-		for (float ay = aPy; ay < aSy; ay++) {
-			bx = bPx;
-			for (float ax = aPx; ax < aSx; ax++) {
-				pixelAtrans = alpha(playerBody.pixels[pA]) < ALPHALEVEL;
-				pixelBtrans = alpha(makeToken.pixels[pB]) < ALPHALEVEL;
-
-				if (!pixelAtrans && !pixelBtrans) {
-					foundCollision = true;
-					break;
-				}
-				pA ++;
-				pB ++;
-				bx ++;
-			}
-			if (foundCollision) break;
-			pA = pA + (barRight - barLeft) - widthOverlap;
-			pB = pB + tokenArray[2] - widthOverlap;
-			by1++;
-		}
-		return foundCollision;
 	}
-
-
-
-
-
-
-
-
-
-/*
-
-	boolean overLap(float[] box_box_p, color[] data1, color[] data2){
-		float left = float[0];
-		float top = float[1];
-		float right = float[2];
-		float bot = float[3];
-		for(int y = top; y < bot; y++){
-			for(int x = left; y < right; x++){
-
-				color color1 = data1[(x - left) + (y - top) * (right - left)];
-				color color2 = data2[(x - right) + (y - bot) * (right - left)];
-
-			}
-		}
-	}*/
 }	
