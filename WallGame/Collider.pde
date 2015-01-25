@@ -57,11 +57,8 @@ class Collider {
 		float rightPlayer = max(px0, px1);
 
 		if(((botToken >= topPlayer2) || (topToken <= botPlayer1)) && ((leftToken <= rightPlayer) && (leftToken >= leftPlayer) || (rightToken >= leftPlayer) && (rightToken <= rightPlayer))){
-			//println("new: yes");
-			//println("topToken: "+topToken + " botPlayer1: " + botPlayer1);
 			return true;
 		} else {
-			//println("new: no");
 			return false;
 		}
 	}

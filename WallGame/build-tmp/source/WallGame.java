@@ -21,9 +21,11 @@ public class WallGame extends PApplet {
 -------------------------------------------------------------------*/
 //PlayerMouse playerMouse;
 PlayerKeyboard playerKeyboard;
+PlayerKeyboard playerKeyboard2;
 TokenBullet tokenBullet;
 Token token;
 Collider collider;
+WinConditions winConditions;
 
 int color1 = PApplet.parseInt(random(255));
 int color2 = PApplet.parseInt(random(255));
@@ -38,16 +40,21 @@ int fieldBot;
 -------------------------------------------------------------------*/
 public void setup() {
   size(1280, 720);
-  //frameRate(5);
 
   fieldTop = height/10;
   fieldBot = ((height/10)*9);
 	playerKeyboard = new PlayerKeyboard();
 	playerKeyboard.setYPosition(height/2);
 	playerKeyboard.setXPosition(width/5);
+
+	playerKeyboard2 =new PlayerKeyboard();
+	playerKeyboard2.setYPosition(height/2);
+	playerKeyboard2.setXPosition((width/5)*4);
+
 	tokenBullet = new TokenBullet();
 	tokenBullet.setTokenX(-10);
   collider = new Collider();
+  winConditions = new WinConditions();
 }
 
 public void draw() {
@@ -57,7 +64,9 @@ public void draw() {
 	fill(player);
 	rect(0, 0, width, fieldTop);
 	rect(0, fieldBot, width, height);
-	
+
+	playerKeyboard2.playerBody();
+	fill(player);
 	playerKeyboard.playerBody();
 	tokenBullet.makeToken();
 }
@@ -124,11 +133,8 @@ class Collider {
 		float rightPlayer = max(px0, px1);
 
 		if(((botToken >= topPlayer2) || (topToken <= botPlayer1)) && ((leftToken <= rightPlayer) && (leftToken >= leftPlayer) || (rightToken >= leftPlayer) && (rightToken <= rightPlayer))){
-			//println("new: yes");
-			//println("topToken: "+topToken + " botPlayer1: " + botPlayer1);
 			return true;
 		} else {
-			//println("new: no");
 			return false;
 		}
 	}
@@ -136,7 +142,7 @@ class Collider {
 class Player {
   PShape playerBodySvg;
 
-  protected int playerWidth, playerPosY, playerPosX, gapHeight, playerSpeed, barLeft, barRight, gapTop, gapBottom;
+  protected int playerWidth, playerPosY, playerPosX, gapHeight, playerSpeed, barLeft, barRight, gapTop, gapBottom, playerLifes;
           
   /*------------------------------------------------------------------
   ||  Initializer for Class/Object
@@ -145,8 +151,6 @@ class Player {
   ||  Set playerPosX(int)
   ||  Set gapHeight(int)
   -------------------------------------------------------------------*/
-
-
   Player() {
     playerWidth = fieldTop;
     playerPosY = 0;
@@ -154,7 +158,7 @@ class Player {
     gapHeight = 120;
     playerSpeed = 8;
     barLeft = 0;
-
+    playerLifes = 10;
   }
 
   /*------------------------------------------------------------------
@@ -176,6 +180,8 @@ class Player {
     shapeMode(CORNERS);
     shape(playerBodySvg, barLeft, gapBottom, barRight, fieldBot);
 
+    winConditions.printPlayerLifes(fieldBot, playerPosX, fieldTop, getPlayerLifes());
+
     collider.fillPlayerArray(barLeft, fieldTop, barRight, gapTop, gapBottom, fieldBot);
   }
 
@@ -185,15 +191,12 @@ class Player {
   protected void setYPosition(float _position) {
     playerPosY = PApplet.parseInt(_position);
   }
-
   protected void setYPositionDown(int _step) {
     playerPosY = getYPosition() + _step;
   }
-
   protected void setYPositionUp(int _step) {
     playerPosY = getYPosition() - _step;
   }
-
   protected int getYPosition() {
     return playerPosY;
   }
@@ -204,15 +207,12 @@ class Player {
   protected void setXPosition(float _position) {
     playerPosX = PApplet.parseInt(_position);
   }
-
   protected void setXPositionRight(int _step) {
     playerPosX = getXPosition() + _step;
   }
-
   protected void setXPositionLeft(int _step) {
     playerPosX = getXPosition() - _step;
   }
-
   protected int getXPosition() {
     return playerPosX;
   }
@@ -220,25 +220,39 @@ class Player {
   /*------------------------------------------------------------------
   ||  Get Body values
   -------------------------------------------------------------------*/
-
- /* protected void setBarLeft() {
-    
-  }*/
-
   protected int getBarLeft() {
     return barLeft;
   }
-
   protected int getBarRight() {
     return barRight;
   }
-
   protected int getGapTop() {
     return gapTop;
   }
-
   protected int getGapBottom() {
     return gapBottom;
+  }
+
+
+  protected void setPlayerSpeed(int _step) {
+    playerSpeed = PApplet.parseInt(_step);
+  }
+  protected void setPlayerSpeedUp(int _step) {
+    playerSpeed = getPlayerSpeed() + _step;
+  }
+  protected int getPlayerSpeed() {
+    return playerSpeed;
+  }
+
+
+  protected void setPlayerLifes(int _step) {
+    playerLifes = PApplet.parseInt(_step);
+  }
+  protected void setPlayerLifesDown(int _step) {
+    playerLifes = getPlayerLifes() - PApplet.parseInt(_step);
+  }
+  protected int getPlayerLifes() {
+    return playerLifes;
   }
 }
 class PlayerKeyboard extends Player {
@@ -263,7 +277,7 @@ class PlayerKeyboard extends Player {
         } else if (playerPosY - gapHeight/2 == fieldTop) {
           setYPositionUp(0);
         } else {
-          setYPositionUp(playerSpeed);
+          setYPositionUp(getPlayerSpeed());
         }
       break;
       case 's': case 'S':
@@ -272,7 +286,7 @@ class PlayerKeyboard extends Player {
         } else if (playerPosY + gapHeight/2 == fieldBot) {
           setYPositionUp(0);
         } else {
-          setYPositionDown(playerSpeed);          
+          setYPositionDown(getPlayerSpeed());          
         }
       break;
       default:
@@ -291,14 +305,12 @@ class Token {
 	|| 	Set tokenSpeed(int)
 	||  Set tokenSize(int)
 	-------------------------------------------------------------------*/
-	//TokenBullet tokenbullet;
-
 	Token() {
 		maxKind = 1;
 		kind = 0;
-		tokenSpeed = 6;
-		tokenWidth = 10;
-		tokenHeight = 10;
+		tokenSpeed = 4;
+		tokenWidth = 15;
+		tokenHeight = 15;
 		tokenX = 0;
 		tokenY = 0;
 		collision = 0;
@@ -307,21 +319,18 @@ class Token {
 	}
 	
 	float startYmin = fieldTop;
-	float startYmax = fieldBot - tokenWidth;
+	float startYmax = fieldBot - tokenHeight;
 	
 	public void makeToken() {
-		//setTokenXRight(-tokenWidth);
 		if (tokenX == -tokenWidth) {
-			kind = PApplet.parseInt(random(0, maxKind));
+			kind = PApplet.parseInt(random(0, maxKind+1));
 			setTokenY(random(startYmin, startYmax));
-			//println("tokenX: "+tokenX);
 			resetToken(0);
 		}
 
   /*------------------------------------------------------------------
   ||  check collision 
   -------------------------------------------------------------------*/
-
 		switch (kind) {
 			case 0 :
 				if (tokenX <= width + tokenWidth) {
@@ -329,9 +338,9 @@ class Token {
 						setTokenXRight(getTokenSpeed());
 						tokenBullet.makeBullet(tokenX, tokenY);
 					} else {
+
 						setTokenSpeed(6);
 						setTokenX(-tokenWidth);
-
 					  resetToken(0);
 					}
 				} else {
@@ -346,6 +355,7 @@ class Token {
 						tokenBullet.makeSpeed(tokenX, tokenY);
 					} else {
 						setTokenX(-tokenWidth);
+						setTokenSpeed(6);
 						resetToken(0);
 					}
 				} else {
@@ -359,19 +369,15 @@ class Token {
   /*------------------------------------------------------------------
   ||  Set/Get X Position of Token
   -------------------------------------------------------------------*/
-
 	public void setTokenX(float _position){
 		tokenX = PApplet.parseInt(_position);
 	}
-
   public void setTokenXRight(int _step) {
 		tokenX = getTokenX() + _step;
   }
-
   public void setTokenXLeft(int _step) {
 		tokenX = getTokenX() - _step;
   }
-
   public int getTokenX() {
 		return tokenX;
   }
@@ -379,19 +385,15 @@ class Token {
   /*------------------------------------------------------------------
   ||  Set/Get Y Position of Token
   -------------------------------------------------------------------*/
-
 	public void setTokenY(float _position){
 		tokenY = PApplet.parseInt(_position);
 	}
-
   public void setTokenYDown(int _step) {
 		tokenY = getTokenY() + _step;
   }
-
   public void setTokenYUp(int _step) {
 		tokenY = getTokenY() - _step;
   }
-
   public int getTokenY() {
 		return tokenY;
   }
@@ -399,39 +401,31 @@ class Token {
   /*------------------------------------------------------------------
   ||  Set/Get Token speed
   -------------------------------------------------------------------*/
-
-
   public void setTokenSpeed(int _tokenSpeed) {
   	tokenSpeed = PApplet.parseInt(_tokenSpeed);
   }
-
   public void setTokenSpeedUp(int _step) {
   	tokenSpeed = getTokenSpeed() + _step;
   }
-
   public void setTokenSpeedDown(int _step) {
   	tokenSpeed = getTokenSpeed() - _step;
   }
-
   public int getTokenSpeed() {
   	return tokenSpeed;
   }
 
-
-
-
+  /*------------------------------------------------------------------
+  ||  Set/Get Collision Step
+  -------------------------------------------------------------------*/
   public void setCollisionStep(int _collisionStep) {
   	collisionStep = PApplet.parseInt(_collisionStep);
   }
-
   public void setCollisionStepUp(int _step) {
   	collisionStep = getCollisionStep() + _step;
   }
-
   public int getCollisionStep() {
   	return collisionStep;
   }
-
 
 
  	public boolean resetToken(int _reset) {
@@ -452,7 +446,6 @@ class TokenBullet extends Token {
 		super();
 	}
 
-
 	protected void makeTokenSvg(String _tokenPath) {
 		tokenSvg = loadShape(_tokenPath);
 		tokenSvg.disableStyle();
@@ -461,24 +454,19 @@ class TokenBullet extends Token {
 		shape(tokenSvg, tokenX, tokenY, tokenWidth, tokenHeight);
 	}
 
-
 	protected void makeTokenExplode(String _tokenPath){
 		tokenSvg = loadShape(_tokenPath);
 		tokenSvg.disableStyle();
 		noStroke();
 		int _step = getCollisionStep();
-		println("_step: "+_step);
-		fill(255, 255, 255, 255-(_step*7));
+		fill(player, 255-(_step*7));
 		shapeMode(CORNER);
-		shape(tokenSvg, tokenX, tokenY, tokenWidth, tokenHeight);
+		shape(tokenSvg, tokenX-_step/2, tokenY-_step/2, tokenWidth+_step/2, tokenHeight+_step/2);
 	}
-
-
 
 	public void makeBullet(float tokenX, float tokenY) {
 		collider.fillTokenArray(tokenX, tokenY, tokenWidth, tokenHeight);
 		collider.collision();
-		println("collider.collision(): "+collider.collision());
 
 		if (collider.collision()) {
 			if (getCollisionStep() < 36) {
@@ -486,22 +474,48 @@ class TokenBullet extends Token {
 				makeTokenExplode("svgs/rectangle.svg");
 				setCollisionStepUp(1);
 			} else {
+					if (tokenX < width/2) {
+  				playerKeyboard.setPlayerLifesDown(1);
+  			}
 				setCollisionStep(0);
 				resetToken(1);
 			}
 		} else {
-			fill(255, 255, 255);
+			fill(player);
 			makeTokenSvg("svgs/rectangle.svg");
 		}
 	}
 
-
-
 	public void makeSpeed(float tokenX, float tokenY) {
-		fill(0, 0, 0);
-		makeTokenSvg("svgs/triangle.svg");
-		collider.collision();
 		collider.fillTokenArray(tokenX, tokenY, tokenWidth, tokenHeight);
+		collider.collision();
+
+		if (collider.collision()) {
+			if (getCollisionStep() < 36) {
+				setTokenSpeed(0);
+				makeTokenExplode("svgs/MovePlayerRight.svg");
+				setCollisionStepUp(1);
+			} else {
+				playerKeyboard.setPlayerSpeedUp(2);
+				setCollisionStep(0);
+				resetToken(1);
+			}
+		} else {
+			fill(player);
+			makeTokenSvg("svgs/MovePlayerRight.svg");
+		}
+
+	}
+}
+class WinConditions {	
+
+
+	public void printPlayerLifes(float _fieldBot, float _playerPosX, float _fieldTop, int _lifes) {
+		int fondtSize = 35;
+		textSize(fondtSize);
+		textAlign(CENTER);
+		fill(field);
+		text(_lifes, _playerPosX, (_fieldBot + _fieldTop/2 + fondtSize/3));
 	}
 }
   static public void main(String[] passedArgs) {

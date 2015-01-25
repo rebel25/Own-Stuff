@@ -8,14 +8,12 @@ class Token {
 	|| 	Set tokenSpeed(int)
 	||  Set tokenSize(int)
 	-------------------------------------------------------------------*/
-	//TokenBullet tokenbullet;
-
 	Token() {
 		maxKind = 1;
 		kind = 0;
-		tokenSpeed = 6;
-		tokenWidth = 10;
-		tokenHeight = 10;
+		tokenSpeed = 4;
+		tokenWidth = 15;
+		tokenHeight = 15;
 		tokenX = 0;
 		tokenY = 0;
 		collision = 0;
@@ -24,21 +22,18 @@ class Token {
 	}
 	
 	float startYmin = fieldTop;
-	float startYmax = fieldBot - tokenWidth;
+	float startYmax = fieldBot - tokenHeight;
 	
 	void makeToken() {
-		//setTokenXRight(-tokenWidth);
 		if (tokenX == -tokenWidth) {
-			kind = int(random(0, maxKind));
+			kind = int(random(0, maxKind+1));
 			setTokenY(random(startYmin, startYmax));
-			//println("tokenX: "+tokenX);
 			resetToken(0);
 		}
 
   /*------------------------------------------------------------------
   ||  check collision 
   -------------------------------------------------------------------*/
-
 		switch (kind) {
 			case 0 :
 				if (tokenX <= width + tokenWidth) {
@@ -46,9 +41,9 @@ class Token {
 						setTokenXRight(getTokenSpeed());
 						tokenBullet.makeBullet(tokenX, tokenY);
 					} else {
+
 						setTokenSpeed(6);
 						setTokenX(-tokenWidth);
-
 					  resetToken(0);
 					}
 				} else {
@@ -63,6 +58,7 @@ class Token {
 						tokenBullet.makeSpeed(tokenX, tokenY);
 					} else {
 						setTokenX(-tokenWidth);
+						setTokenSpeed(6);
 						resetToken(0);
 					}
 				} else {
@@ -76,19 +72,15 @@ class Token {
   /*------------------------------------------------------------------
   ||  Set/Get X Position of Token
   -------------------------------------------------------------------*/
-
 	void setTokenX(float _position){
 		tokenX = int(_position);
 	}
-
   void setTokenXRight(int _step) {
 		tokenX = getTokenX() + _step;
   }
-
   void setTokenXLeft(int _step) {
 		tokenX = getTokenX() - _step;
   }
-
   int getTokenX() {
 		return tokenX;
   }
@@ -96,19 +88,15 @@ class Token {
   /*------------------------------------------------------------------
   ||  Set/Get Y Position of Token
   -------------------------------------------------------------------*/
-
 	void setTokenY(float _position){
 		tokenY = int(_position);
 	}
-
   void setTokenYDown(int _step) {
 		tokenY = getTokenY() + _step;
   }
-
   void setTokenYUp(int _step) {
 		tokenY = getTokenY() - _step;
   }
-
   int getTokenY() {
 		return tokenY;
   }
@@ -116,39 +104,31 @@ class Token {
   /*------------------------------------------------------------------
   ||  Set/Get Token speed
   -------------------------------------------------------------------*/
-
-
   void setTokenSpeed(int _tokenSpeed) {
   	tokenSpeed = int(_tokenSpeed);
   }
-
   void setTokenSpeedUp(int _step) {
   	tokenSpeed = getTokenSpeed() + _step;
   }
-
   void setTokenSpeedDown(int _step) {
   	tokenSpeed = getTokenSpeed() - _step;
   }
-
   int getTokenSpeed() {
   	return tokenSpeed;
   }
 
-
-
-
+  /*------------------------------------------------------------------
+  ||  Set/Get Collision Step
+  -------------------------------------------------------------------*/
   void setCollisionStep(int _collisionStep) {
   	collisionStep = int(_collisionStep);
   }
-
   void setCollisionStepUp(int _step) {
   	collisionStep = getCollisionStep() + _step;
   }
-
   int getCollisionStep() {
   	return collisionStep;
   }
-
 
 
  	boolean resetToken(int _reset) {
