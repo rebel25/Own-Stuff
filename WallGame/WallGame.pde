@@ -3,14 +3,17 @@
 /*------------------------------------------------------------------
 ||  Initializer for Class/Object from Superclass Player
 -------------------------------------------------------------------*/
-//PlayerMouse playerMouse;
+import ddf.minim.*;
+
 PlayerKeyboard playerKeyboard;
-PlayerKeyboard playerKeyboard2;
 TokenBullet tokenBullet;
 Token token;
 Collider collider;
 WinConditions winConditions;
+Minim minim;
+AudioPlayer audioPlayer;
 
+boolean[] keys = new boolean[2];
 int color1 = int(random(255));
 int color2 = int(random(255));
 int color3 = int(random(255));
@@ -25,36 +28,72 @@ int fieldBot;
 void setup() {
   size(1280, 720);
 
+  //background
   fieldTop = height/10;
   fieldBot = ((height/10)*9);
+  winConditions = new WinConditions();
 	playerKeyboard = new PlayerKeyboard();
 	playerKeyboard.setYPosition(height/2);
-	playerKeyboard.setXPosition(width/5);
-
-	playerKeyboard2 =new PlayerKeyboard();
-	playerKeyboard2.setYPosition(height/2);
-	playerKeyboard2.setXPosition((width/5)*4);
+	playerKeyboard.setXPosition(width/3);
+	
 
 	tokenBullet = new TokenBullet();
-	tokenBullet.setTokenX(-10);
-  collider = new Collider();
-  winConditions = new WinConditions();
+	collider = new Collider();
+	
+  
+  //soundtrack
+  minim = new Minim(this); 
+  audioPlayer = minim.loadFile("music/theme.mp3");
+  audioPlayer.loop();
 }
 
+/*------------------------------------------------------------------
+||  Draw function for processing
+||  Switch for displayed screen
+-------------------------------------------------------------------*/
 void draw() {
 	background(field);
-	noStroke();
+  switch (winConditions.getGameState()) {
+   	case 0 :
+   		winConditions.startScreen();
+   	break;
+   	case 1 :
+   		noStroke();
+			fill(player);
+			rect(0, 0, width, fieldTop);
+			rect(0, fieldBot, width, height);
 
-	fill(player);
-	rect(0, 0, width, fieldTop);
-	rect(0, fieldBot, width, height);
-
-	playerKeyboard2.playerBody();
-	fill(player);
-	playerKeyboard.playerBody();
-	tokenBullet.makeToken();
+			playerKeyboard.playerBody();
+			fill(player);
+			tokenBullet.makeToken();
+   	break;	
+   	case 2 :
+   		winConditions.finalScreen();
+   	break;
+  }
 }
 
+ /*------------------------------------------------------------------
+  ||  Make Player move with keyboard - method
+  ||  W || w => Player is going up.
+  ||  S || s => Player is going down.
+  -------------------------------------------------------------------*/
 void keyPressed() {
+    if(key == 'w' || key == 'W') {
+      keys[0] = true;
+    }
+    if(key == 's' || key == 'S') {
+      keys[1] = true;
+    }
+    playerKeyboard.moveWithKeyboard(fieldTop, fieldBot);
+  }
+
+void keyReleased() {
+  if(key == 'w' || key == 'W') {
+    keys[0] = false;
+  }
+  if(key == 's' || key == 'S') {
+    keys[1] = false;
+  }
   playerKeyboard.moveWithKeyboard(fieldTop, fieldBot);
 }

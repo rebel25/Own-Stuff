@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="500px" height="500px" viewBox="0 0 500 500" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+<svg width="501px" height="501px" viewBox="0 0 501 501" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <!-- Generator: Sketch 3.2.2 (9983) - http://www.bohemiancoding.com/sketch -->
-    <title>Rectangle 6</title>
+    <title>Path 5</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
-        <g id="Artboard-1" sketch:type="MSArtboardGroup" transform="translate(-100.000000, -690.000000)">
-            <g id="Rectangle-1-+-Rectangle-3-+-Rectangle-5" sketch:type="MSLayerGroup" transform="translate(100.000000, 97.000000)">
-                <g id="Rectangle-6" transform="translate(0.000000, 593.000000)" sketch:type="MSShapeGroup">
-                    <g id="Rectangle-3-+-Triangle-7-+-Rectangle">
-                        <path d="M0,0 L500,0 L500,500 L0,500 L0,0 Z M250,65 L400,220 L100,220 L250,65 Z M250,35 L400,190 L100,190 L250,35 Z M250,470 L100,315 L400,315 L250,470 Z M250,440 L100,285 L400,285 L250,440 Z" id="Rectangle-3" fill="#D8D8D8"></path>
-                        <polygon id="Triangle-7" fill="#FFFFFF" transform="translate(250.000000, 325.500000) rotate(-180.000000) translate(-250.000000, -325.500000) " points="250 248 400 403 100 403 "></polygon>
-                        <polygon id="Triangle-10" fill="#FFFFFF" points="250 97 400 252 100 252 "></polygon>
-                        <rect id="Rectangle" fill="#D8D8D8" x="58" y="190" width="384" height="127"></rect>
-                    </g>
-                </g>
-            </g>
+        <g id="Artboard-1" sketch:type="MSArtboardGroup" transform="translate(-100.000000, -685.000000)" fill="#D8D8D8">
+            <path d="M100.234375,1185.31626 L600.201172,1185.31626 L600.201172,685.891385 L100.234375,685.891385 L100.234375,1185.31626 Z M200.753906,875.955078 L351.003906,720.755859 L499.833984,876.001953 L470.357422,875.630859 L350.197266,751.583984 L229.40625,875.486328 L200.753906,875.955078 Z M260.59375,875.921875 L350.117188,783.15625 L439.140625,875.501953 L260.59375,875.921875 Z M202.367187,1003.22461 L231.328125,1003.22461 L349.746094,1125.59375 L469.730469,1002.80469 L497.288025,1002.80469 L350.261719,1156.11719 L202.367187,1003.22461 Z M267.029297,1003.31055 L433.049961,1003.31055 L350.054688,1088.77148 L267.029297,1003.31055 Z" id="Path-5" sketch:type="MSShapeGroup"></path>
         </g>
     </g>
 </svg>

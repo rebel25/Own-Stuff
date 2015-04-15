@@ -14,12 +14,13 @@ class Collider {
 	kind = 0;
 	}
 
-	Player player;
-
 	boolean collision(){
 	return box_box_p(tokenArray[0], tokenArray[1], tokenArray[2], tokenArray[3], playerArray[0], playerArray[1], playerArray[2], playerArray[3], playerArray[4], playerArray[5]);
 	}
 
+  /*------------------------------------------------------------------
+  ||  fill player array
+  -------------------------------------------------------------------*/
 	void fillPlayerArray(float _barLeft, float _fieldTop, float _barRight, float _gapTop, float _gapBottom, float _fieldBot){
 		playerArray[0] = _barLeft;
 		playerArray[1] = _fieldTop;
@@ -29,12 +30,19 @@ class Collider {
 		playerArray[5] = _fieldBot;
 	}
 
+  /*------------------------------------------------------------------
+  ||  fill token array
+  -------------------------------------------------------------------*/
 	void fillTokenArray(float _tokenX, float _tokenY, float _tokenWidth, float _tokenHeight){
 		tokenArray[0] = _tokenX;
 		tokenArray[1] = _tokenY;
 		tokenArray[2] = _tokenWidth;
 		tokenArray[3] = _tokenHeight;
 	}
+
+  /*------------------------------------------------------------------
+  ||  collision detection
+  -------------------------------------------------------------------*/
 
 	boolean box_box_p(float tx0, float ty0, float tx1, float ty1, float px0, float py0, float px1, float py1, float py2, float py3){
 		
@@ -57,6 +65,7 @@ class Collider {
 		float rightPlayer = max(px0, px1);
 
 		if(((botToken >= topPlayer2) || (topToken <= botPlayer1)) && ((leftToken <= rightPlayer) && (leftToken >= leftPlayer) || (rightToken >= leftPlayer) && (rightToken <= rightPlayer))){
+				tokenBullet.activateAnimation(1);
 			return true;
 		} else {
 			return false;

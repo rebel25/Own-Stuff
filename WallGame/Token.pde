@@ -1,6 +1,6 @@
 class Token {
 
-	protected int kind, tokenSpeed, tokenWidth, tokenHeight, tokenX, tokenY, maxKind, collision, collisionStep, reset;
+	protected int kind, tokenSpeed, tokenWidth, tokenHeight, tokenX, tokenY, maxKind, collision, collisionStep, reset, animation;
 
 	/*------------------------------------------------------------------
 	||  Initializer for Class/Object
@@ -12,19 +12,21 @@ class Token {
 		maxKind = 1;
 		kind = 0;
 		tokenSpeed = 4;
-		tokenWidth = 15;
-		tokenHeight = 15;
-		tokenX = 0;
+		tokenWidth = height/20;
+		tokenHeight = height/20;
+		tokenX = -10;
 		tokenY = 0;
 		collision = 0;
 		collisionStep = 0;
 		reset = 0;
+		animation = 0;
 	}
-	
+
 	float startYmin = fieldTop;
 	float startYmax = fieldBot - tokenHeight;
 	
 	void makeToken() {
+		collider.collision();
 		if (tokenX == -tokenWidth) {
 			kind = int(random(0, maxKind+1));
 			setTokenY(random(startYmin, startYmax));
@@ -41,10 +43,9 @@ class Token {
 						setTokenXRight(getTokenSpeed());
 						tokenBullet.makeBullet(tokenX, tokenY);
 					} else {
-
 						setTokenSpeed(6);
-						setTokenX(-tokenWidth);
 					  resetToken(0);
+					  setTokenX(-tokenWidth);
 					}
 				} else {
 					setTokenX(-tokenWidth);
@@ -57,8 +58,8 @@ class Token {
 					 	setTokenXRight(getTokenSpeed());
 						tokenBullet.makeSpeed(tokenX, tokenY);
 					} else {
-						setTokenX(-tokenWidth);
 						setTokenSpeed(6);
+						setTokenX(-tokenWidth);
 						resetToken(0);
 					}
 				} else {
@@ -130,10 +131,29 @@ class Token {
   	return collisionStep;
   }
 
+  void activateAnimation(int _activate) {
+  	if (_activate == 1) {
+  		animation = 1;
+  	}
+  }
+  void deactivateAnimation(int _activate) {
+  	if (_activate == 1) {
+  		animation = 0;
+  	}
+  }
+  boolean getAnimation(){
+  	if (animation == 1) {
+  		return true;
+  	} else {
+  		return false;
+  	}
+  }
+
 
  	boolean resetToken(int _reset) {
   	if (_reset > 0) {
   		reset = 1;
+  		deactivateAnimation(1);
   		return true;
   	} else {
   		reset = 0;

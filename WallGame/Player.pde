@@ -9,6 +9,9 @@ class Player {
   ||  Set playerPosY(int)
   ||  Set playerPosX(int)
   ||  Set gapHeight(int)
+  ||  Set playerSpeed(int)
+  ||  Set barLeft(int)
+  ||  Set playerLifes(int)
   -------------------------------------------------------------------*/
   Player() {
     playerWidth = fieldTop;
@@ -39,9 +42,11 @@ class Player {
     shapeMode(CORNERS);
     shape(playerBodySvg, barLeft, gapBottom, barRight, fieldBot);
 
-    winConditions.printPlayerLifes(fieldBot, playerPosX, fieldTop, getPlayerLifes());
-
+    // fill player array
     collider.fillPlayerArray(barLeft, fieldTop, barRight, gapTop, gapBottom, fieldBot);
+
+    winConditions.printPlayerLifes(fieldBot, playerPosX, fieldTop, getPlayerLifes());
+    winConditions.gameLost(getPlayerLifes());
   }
 
   /*------------------------------------------------------------------
@@ -92,7 +97,9 @@ class Player {
     return gapBottom;
   }
 
-
+ /*------------------------------------------------------------------
+  ||  Set / Get player speed
+  -------------------------------------------------------------------*/
   protected void setPlayerSpeed(int _step) {
     playerSpeed = int(_step);
   }
@@ -103,7 +110,9 @@ class Player {
     return playerSpeed;
   }
 
-
+/*------------------------------------------------------------------
+  ||  Set / Get player lifes
+  -------------------------------------------------------------------*/
   protected void setPlayerLifes(int _step) {
     playerLifes = int(_step);
   }

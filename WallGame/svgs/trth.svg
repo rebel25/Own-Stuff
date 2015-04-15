@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="500px" height="500px" viewBox="0 0 500 500" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.2.2 (9983) - http://www.bohemiancoding.com/sketch -->
+    <title>Mask</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Artboard-1" sketch:type="MSArtboardGroup" transform="translate(-100.000000, -95.000000)" fill="#D8D8D8">
+            <g id="New-Mask-Group" sketch:type="MSLayerGroup" transform="translate(100.000000, 95.000000)">
+                <path d="M0.44620491,499.3176 L499.667213,499.3176 L499.667213,0.4463142 L0.44620491,0.150390625 L0.44620491,499.3176 Z M99.6954847,225.257812 L99.6954847,275.315585 L400.682236,275.315585 L400.682236,225.404021 L99.6954847,225.257812 Z M250.326826,35.502407 L399.212487,189.543734 L99.7913796,189.367052 L250.326826,35.502407 Z M248.550781,464.405062 L99.9628906,310.363735 L398.785156,310.540417 L248.550781,464.405062 Z" id="Mask" sketch:type="MSShapeGroup"></path>
+            </g>
+        </g>
+    </g>
+</svg>

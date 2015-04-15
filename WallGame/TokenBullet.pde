@@ -1,15 +1,19 @@
 class TokenBullet extends Token {
 
-	PShape tokenSvg;
-
 	TokenBullet() {
 		super();
 	}
 
+	PShape tokenSvg;
+
+/*------------------------------------------------------------------
+  ||  Token states
+-------------------------------------------------------------------*/
 	protected void makeTokenSvg(String _tokenPath) {
 		tokenSvg = loadShape(_tokenPath);
 		tokenSvg.disableStyle();
 		noStroke();
+		fill(player);
 		shapeMode(CORNER);
 		shape(tokenSvg, tokenX, tokenY, tokenWidth, tokenHeight);
 	}
@@ -21,49 +25,46 @@ class TokenBullet extends Token {
 		int _step = getCollisionStep();
 		fill(player, 255-(_step*7));
 		shapeMode(CORNER);
-		shape(tokenSvg, tokenX-_step/2, tokenY-_step/2, tokenWidth+_step/2, tokenHeight+_step/2);
+		shape(tokenSvg, tokenX-_step, tokenY-_step, tokenWidth+_step, tokenHeight+_step);
 	}
 
 	void makeBullet(float tokenX, float tokenY) {
+		//fill token Array
 		collider.fillTokenArray(tokenX, tokenY, tokenWidth, tokenHeight);
-		collider.collision();
 
-		if (collider.collision()) {
+		if (getAnimation()) {
 			if (getCollisionStep() < 36) {
 				setTokenSpeed(0);
 				makeTokenExplode("svgs/rectangle.svg");
 				setCollisionStepUp(1);
 			} else {
-					if (tokenX < width/2) {
-  				playerKeyboard.setPlayerLifesDown(1);
-  			}
+  			playerKeyboard.setPlayerLifesDown(1);
+  			deactivateAnimation(1);
 				setCollisionStep(0);
 				resetToken(1);
 			}
 		} else {
-			fill(player);
-			makeTokenSvg("svgs/rectangle.svg");
+				makeTokenSvg("svgs/rectangle.svg");
 		}
 	}
 
 	void makeSpeed(float tokenX, float tokenY) {
+	//fill player array	
 		collider.fillTokenArray(tokenX, tokenY, tokenWidth, tokenHeight);
-		collider.collision();
 
-		if (collider.collision()) {
+		if (getAnimation()) {
 			if (getCollisionStep() < 36) {
 				setTokenSpeed(0);
-				makeTokenExplode("svgs/MovePlayerRight.svg");
+				makeTokenExplode("svgs/trth.svg");
 				setCollisionStepUp(1);
 			} else {
 				playerKeyboard.setPlayerSpeedUp(2);
+				deactivateAnimation(1);
 				setCollisionStep(0);
 				resetToken(1);
 			}
 		} else {
-			fill(player);
-			makeTokenSvg("svgs/MovePlayerRight.svg");
+			makeTokenSvg("svgs/trth.svg");
 		}
-
 	}
 }

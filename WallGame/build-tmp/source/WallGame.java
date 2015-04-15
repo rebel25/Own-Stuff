@@ -3,6 +3,8 @@ import processing.data.*;
 import processing.event.*; 
 import processing.opengl.*; 
 
+import ddf.minim.*; 
+
 import java.util.HashMap; 
 import java.util.ArrayList; 
 import java.io.File; 
@@ -19,14 +21,17 @@ public class WallGame extends PApplet {
 /*------------------------------------------------------------------
 ||  Initializer for Class/Object from Superclass Player
 -------------------------------------------------------------------*/
-//PlayerMouse playerMouse;
+
+
 PlayerKeyboard playerKeyboard;
-PlayerKeyboard playerKeyboard2;
 TokenBullet tokenBullet;
 Token token;
 Collider collider;
 WinConditions winConditions;
+Minim minim;
+AudioPlayer audioPlayer;
 
+boolean[] keys = new boolean[2];
 int color1 = PApplet.parseInt(random(255));
 int color2 = PApplet.parseInt(random(255));
 int color3 = PApplet.parseInt(random(255));
@@ -41,37 +46,73 @@ int fieldBot;
 public void setup() {
   size(1280, 720);
 
+  //background
   fieldTop = height/10;
   fieldBot = ((height/10)*9);
+  winConditions = new WinConditions();
 	playerKeyboard = new PlayerKeyboard();
 	playerKeyboard.setYPosition(height/2);
-	playerKeyboard.setXPosition(width/5);
-
-	playerKeyboard2 =new PlayerKeyboard();
-	playerKeyboard2.setYPosition(height/2);
-	playerKeyboard2.setXPosition((width/5)*4);
+	playerKeyboard.setXPosition(width/3);
+	
 
 	tokenBullet = new TokenBullet();
-	tokenBullet.setTokenX(-10);
-  collider = new Collider();
-  winConditions = new WinConditions();
+	collider = new Collider();
+	
+  
+  //soundtrack
+  minim = new Minim(this); 
+  audioPlayer = minim.loadFile("music/theme.mp3");
+  audioPlayer.loop();
 }
 
+/*------------------------------------------------------------------
+||  Draw function for processing
+||  Switch for displayed screen
+-------------------------------------------------------------------*/
 public void draw() {
 	background(field);
-	noStroke();
+  switch (winConditions.getGameState()) {
+   	case 0 :
+   		winConditions.startScreen();
+   	break;
+   	case 1 :
+   		noStroke();
+			fill(player);
+			rect(0, 0, width, fieldTop);
+			rect(0, fieldBot, width, height);
 
-	fill(player);
-	rect(0, 0, width, fieldTop);
-	rect(0, fieldBot, width, height);
-
-	playerKeyboard2.playerBody();
-	fill(player);
-	playerKeyboard.playerBody();
-	tokenBullet.makeToken();
+			playerKeyboard.playerBody();
+			fill(player);
+			tokenBullet.makeToken();
+   	break;	
+   	case 2 :
+   		winConditions.finalScreen();
+   	break;
+  }
 }
 
+ /*------------------------------------------------------------------
+  ||  Make Player move with keyboard - method
+  ||  W || w => Player is going up.
+  ||  S || s => Player is going down.
+  -------------------------------------------------------------------*/
 public void keyPressed() {
+    if(key == 'w' || key == 'W') {
+      keys[0] = true;
+    }
+    if(key == 's' || key == 'S') {
+      keys[1] = true;
+    }
+    playerKeyboard.moveWithKeyboard(fieldTop, fieldBot);
+  }
+
+public void keyReleased() {
+  if(key == 'w' || key == 'W') {
+    keys[0] = false;
+  }
+  if(key == 's' || key == 'S') {
+    keys[1] = false;
+  }
   playerKeyboard.moveWithKeyboard(fieldTop, fieldBot);
 }
 class Collider {
@@ -90,12 +131,13 @@ class Collider {
 	kind = 0;
 	}
 
-	Player player;
-
 	public boolean collision(){
 	return box_box_p(tokenArray[0], tokenArray[1], tokenArray[2], tokenArray[3], playerArray[0], playerArray[1], playerArray[2], playerArray[3], playerArray[4], playerArray[5]);
 	}
 
+  /*------------------------------------------------------------------
+  ||  fill player array
+  -------------------------------------------------------------------*/
 	public void fillPlayerArray(float _barLeft, float _fieldTop, float _barRight, float _gapTop, float _gapBottom, float _fieldBot){
 		playerArray[0] = _barLeft;
 		playerArray[1] = _fieldTop;
@@ -105,12 +147,19 @@ class Collider {
 		playerArray[5] = _fieldBot;
 	}
 
+  /*------------------------------------------------------------------
+  ||  fill token array
+  -------------------------------------------------------------------*/
 	public void fillTokenArray(float _tokenX, float _tokenY, float _tokenWidth, float _tokenHeight){
 		tokenArray[0] = _tokenX;
 		tokenArray[1] = _tokenY;
 		tokenArray[2] = _tokenWidth;
 		tokenArray[3] = _tokenHeight;
 	}
+
+  /*------------------------------------------------------------------
+  ||  collision detection
+  -------------------------------------------------------------------*/
 
 	public boolean box_box_p(float tx0, float ty0, float tx1, float ty1, float px0, float py0, float px1, float py1, float py2, float py3){
 		
@@ -133,12 +182,24 @@ class Collider {
 		float rightPlayer = max(px0, px1);
 
 		if(((botToken >= topPlayer2) || (topToken <= botPlayer1)) && ((leftToken <= rightPlayer) && (leftToken >= leftPlayer) || (rightToken >= leftPlayer) && (rightToken <= rightPlayer))){
+				tokenBullet.activateAnimation(1);
 			return true;
 		} else {
 			return false;
 		}
 	}
 }	
+/*class Music {
+
+
+
+
+
+void playIntro() {
+	intro = new Minim("music/intro.wav");
+	file.play();
+	}
+}*/
 class Player {
   PShape playerBodySvg;
 
@@ -150,6 +211,9 @@ class Player {
   ||  Set playerPosY(int)
   ||  Set playerPosX(int)
   ||  Set gapHeight(int)
+  ||  Set playerSpeed(int)
+  ||  Set barLeft(int)
+  ||  Set playerLifes(int)
   -------------------------------------------------------------------*/
   Player() {
     playerWidth = fieldTop;
@@ -180,9 +244,11 @@ class Player {
     shapeMode(CORNERS);
     shape(playerBodySvg, barLeft, gapBottom, barRight, fieldBot);
 
-    winConditions.printPlayerLifes(fieldBot, playerPosX, fieldTop, getPlayerLifes());
-
+    // fill player array
     collider.fillPlayerArray(barLeft, fieldTop, barRight, gapTop, gapBottom, fieldBot);
+
+    winConditions.printPlayerLifes(fieldBot, playerPosX, fieldTop, getPlayerLifes());
+    winConditions.gameLost(getPlayerLifes());
   }
 
   /*------------------------------------------------------------------
@@ -233,7 +299,9 @@ class Player {
     return gapBottom;
   }
 
-
+ /*------------------------------------------------------------------
+  ||  Set / Get player speed
+  -------------------------------------------------------------------*/
   protected void setPlayerSpeed(int _step) {
     playerSpeed = PApplet.parseInt(_step);
   }
@@ -244,7 +312,9 @@ class Player {
     return playerSpeed;
   }
 
-
+/*------------------------------------------------------------------
+  ||  Set / Get player lifes
+  -------------------------------------------------------------------*/
   protected void setPlayerLifes(int _step) {
     playerLifes = PApplet.parseInt(_step);
   }
@@ -269,35 +339,32 @@ class PlayerKeyboard extends Player {
   ||  W || w => Player is going up.
   ||  S || s => Player is going down.
   -------------------------------------------------------------------*/
+
   public void moveWithKeyboard(int fieldTop, int fieldBot) {
-    switch(key) {
-      case 'w': case 'W':
-        if (playerPosY - gapHeight/2 < fieldTop) {
-          setYPosition(fieldTop + gapHeight/2);
-        } else if (playerPosY - gapHeight/2 == fieldTop) {
-          setYPositionUp(0);
-        } else {
-          setYPositionUp(getPlayerSpeed());
-        }
-      break;
-      case 's': case 'S':
-        if (playerPosY + gapHeight/2 > fieldBot) {
-          setYPosition(fieldBot - gapHeight/2);
-        } else if (playerPosY + gapHeight/2 == fieldBot) {
-          setYPositionUp(0);
-        } else {
-          setYPositionDown(getPlayerSpeed());          
-        }
-      break;
-      default:
-        println("Default!");
-      break;
+    if (keys[0]) {
+      if (playerPosY - gapHeight/2 < fieldTop) {
+        setYPosition(fieldTop + gapHeight/2);
+      } else if (playerPosY - gapHeight/2 == fieldTop) {
+        setYPositionUp(0);
+      } else {
+        setYPositionUp(getPlayerSpeed());
+      }
+    }
+
+    if(keys[1]) {
+      if (playerPosY + gapHeight/2 > fieldBot) {
+        setYPosition(fieldBot - gapHeight/2);
+      } else if (playerPosY + gapHeight/2 == fieldBot) {
+        setYPositionUp(0);
+      } else {
+        setYPositionDown(getPlayerSpeed());          
+      }     
     }
   }
 }
 class Token {
 
-	protected int kind, tokenSpeed, tokenWidth, tokenHeight, tokenX, tokenY, maxKind, collision, collisionStep, reset;
+	protected int kind, tokenSpeed, tokenWidth, tokenHeight, tokenX, tokenY, maxKind, collision, collisionStep, reset, animation;
 
 	/*------------------------------------------------------------------
 	||  Initializer for Class/Object
@@ -309,19 +376,21 @@ class Token {
 		maxKind = 1;
 		kind = 0;
 		tokenSpeed = 4;
-		tokenWidth = 15;
-		tokenHeight = 15;
-		tokenX = 0;
+		tokenWidth = height/20;
+		tokenHeight = height/20;
+		tokenX = -10;
 		tokenY = 0;
 		collision = 0;
 		collisionStep = 0;
 		reset = 0;
+		animation = 0;
 	}
-	
+
 	float startYmin = fieldTop;
 	float startYmax = fieldBot - tokenHeight;
 	
 	public void makeToken() {
+		collider.collision();
 		if (tokenX == -tokenWidth) {
 			kind = PApplet.parseInt(random(0, maxKind+1));
 			setTokenY(random(startYmin, startYmax));
@@ -338,10 +407,9 @@ class Token {
 						setTokenXRight(getTokenSpeed());
 						tokenBullet.makeBullet(tokenX, tokenY);
 					} else {
-
 						setTokenSpeed(6);
-						setTokenX(-tokenWidth);
 					  resetToken(0);
+					  setTokenX(-tokenWidth);
 					}
 				} else {
 					setTokenX(-tokenWidth);
@@ -354,8 +422,8 @@ class Token {
 					 	setTokenXRight(getTokenSpeed());
 						tokenBullet.makeSpeed(tokenX, tokenY);
 					} else {
-						setTokenX(-tokenWidth);
 						setTokenSpeed(6);
+						setTokenX(-tokenWidth);
 						resetToken(0);
 					}
 				} else {
@@ -427,10 +495,29 @@ class Token {
   	return collisionStep;
   }
 
+  public void activateAnimation(int _activate) {
+  	if (_activate == 1) {
+  		animation = 1;
+  	}
+  }
+  public void deactivateAnimation(int _activate) {
+  	if (_activate == 1) {
+  		animation = 0;
+  	}
+  }
+  public boolean getAnimation(){
+  	if (animation == 1) {
+  		return true;
+  	} else {
+  		return false;
+  	}
+  }
+
 
  	public boolean resetToken(int _reset) {
   	if (_reset > 0) {
   		reset = 1;
+  		deactivateAnimation(1);
   		return true;
   	} else {
   		reset = 0;
@@ -440,16 +527,20 @@ class Token {
 }
 class TokenBullet extends Token {
 
-	PShape tokenSvg;
-
 	TokenBullet() {
 		super();
 	}
 
+	PShape tokenSvg;
+
+/*------------------------------------------------------------------
+  ||  Token states
+-------------------------------------------------------------------*/
 	protected void makeTokenSvg(String _tokenPath) {
 		tokenSvg = loadShape(_tokenPath);
 		tokenSvg.disableStyle();
 		noStroke();
+		fill(player);
 		shapeMode(CORNER);
 		shape(tokenSvg, tokenX, tokenY, tokenWidth, tokenHeight);
 	}
@@ -461,61 +552,125 @@ class TokenBullet extends Token {
 		int _step = getCollisionStep();
 		fill(player, 255-(_step*7));
 		shapeMode(CORNER);
-		shape(tokenSvg, tokenX-_step/2, tokenY-_step/2, tokenWidth+_step/2, tokenHeight+_step/2);
+		shape(tokenSvg, tokenX-_step, tokenY-_step, tokenWidth+_step, tokenHeight+_step);
 	}
 
 	public void makeBullet(float tokenX, float tokenY) {
+		//fill token Array
 		collider.fillTokenArray(tokenX, tokenY, tokenWidth, tokenHeight);
-		collider.collision();
 
-		if (collider.collision()) {
+		if (getAnimation()) {
 			if (getCollisionStep() < 36) {
 				setTokenSpeed(0);
 				makeTokenExplode("svgs/rectangle.svg");
 				setCollisionStepUp(1);
 			} else {
-					if (tokenX < width/2) {
-  				playerKeyboard.setPlayerLifesDown(1);
-  			}
+  			playerKeyboard.setPlayerLifesDown(1);
+  			deactivateAnimation(1);
 				setCollisionStep(0);
 				resetToken(1);
 			}
 		} else {
-			fill(player);
-			makeTokenSvg("svgs/rectangle.svg");
+				makeTokenSvg("svgs/rectangle.svg");
 		}
 	}
 
 	public void makeSpeed(float tokenX, float tokenY) {
+	//fill player array	
 		collider.fillTokenArray(tokenX, tokenY, tokenWidth, tokenHeight);
-		collider.collision();
 
-		if (collider.collision()) {
+		if (getAnimation()) {
 			if (getCollisionStep() < 36) {
 				setTokenSpeed(0);
-				makeTokenExplode("svgs/MovePlayerRight.svg");
+				makeTokenExplode("svgs/trth.svg");
 				setCollisionStepUp(1);
 			} else {
 				playerKeyboard.setPlayerSpeedUp(2);
+				deactivateAnimation(1);
 				setCollisionStep(0);
 				resetToken(1);
 			}
 		} else {
-			fill(player);
-			makeTokenSvg("svgs/MovePlayerRight.svg");
+			makeTokenSvg("svgs/trth.svg");
 		}
-
 	}
 }
 class WinConditions {	
 
+	int gameState = 0;
 
+/*------------------------------------------------------------------
+  ||  Display Playerlifes
+  -------------------------------------------------------------------*/
 	public void printPlayerLifes(float _fieldBot, float _playerPosX, float _fieldTop, int _lifes) {
 		int fondtSize = 35;
 		textSize(fondtSize);
 		textAlign(CENTER);
 		fill(field);
 		text(_lifes, _playerPosX, (_fieldBot + _fieldTop/2 + fondtSize/3));
+	}
+
+/*------------------------------------------------------------------
+  ||  create Screen Layouts
+  ||  input for next screen
+  -------------------------------------------------------------------*/
+	public void startScreen() {
+		textAlign(CENTER);
+		int fondtSize = 60;
+
+		textSize(fondtSize);
+		fill(player);
+		text("Start Game", width/2, height/2);
+
+		textSize((fondtSize/3)*2);
+		fill(player, 200);
+		text("press space", width/2, (height/7)*4);
+
+		if (keyPressed) {
+			if( key == ' '){
+				setGameState(1);
+			}
+		}
+	}
+
+	public void finalScreen() {
+		textAlign(CENTER);
+		int fondtSize = 60;
+
+		textSize(fondtSize);
+		fill(player);
+		text("You Lost", width/2, height/2);
+
+		textSize((fondtSize/3)*2);
+		fill(player, 200);
+		text("play again? press space", width/2, (height/7)*4);
+
+		if (keyPressed) {
+			if( key == ' '){
+				setGameState(1);
+				playerKeyboard.setPlayerLifes(10);
+			}
+		}
+	}
+
+
+	/*------------------------------------------------------------------
+  ||  lose condition
+  -------------------------------------------------------------------*/
+	public void gameLost(int _playerLifes) {
+		if (_playerLifes == 0) {
+			setGameState(2);
+		}
+	}
+
+/*------------------------------------------------------------------
+  ||  set/get gamestate
+  -------------------------------------------------------------------*/
+	public int getGameState() {
+		return gameState;
+	}
+	public void setGameState(int _step) {
+		gameState = _step;
 	}
 }
   static public void main(String[] passedArgs) {
